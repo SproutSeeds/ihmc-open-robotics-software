@@ -163,7 +163,7 @@ public class OpenAlexanderRobotModel implements DRCRobotModel
 
       modelFactory = new AlexanderModelFactory(robotVersion, jointMap, contactPointParameters, new AlexanderRigidBodyMutator(getPhysicalProperties(), imusToIgnore));
       logModelProvider = modelFactory.createLogModelProvider();
-      scs1RobotDefinition = modelFactory.getSCS1RobotDefinition();
+      scs1RobotDefinition = modelFactory.getSCS1RobotDefinition(true);
       controllerRobotDefinition = modelFactory.getControllerRobotDefinition();
 
       if (robotMaterial != null)
