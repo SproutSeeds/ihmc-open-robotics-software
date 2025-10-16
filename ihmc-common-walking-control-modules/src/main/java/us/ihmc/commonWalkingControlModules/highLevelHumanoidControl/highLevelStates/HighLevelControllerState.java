@@ -46,6 +46,11 @@ public abstract class HighLevelControllerState implements State, JointLoadStatus
       jointSettingsHelper = null;
    }
 
+   public double getCustomControlRate()
+   {
+      return Double.NaN;
+   }
+
    public YoRegistry getYoRegistry()
    {
       return registry;

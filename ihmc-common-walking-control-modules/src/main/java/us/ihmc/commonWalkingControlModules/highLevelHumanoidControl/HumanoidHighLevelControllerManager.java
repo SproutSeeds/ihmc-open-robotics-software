@@ -371,6 +371,11 @@ public class HumanoidHighLevelControllerManager implements RobotController, SCS2
       statusMessageOutputManager.reportStatusMessage(robotDesiredConfigurationData);
    }
 
+   public HighLevelControllerState getHighLevelControllerState(HighLevelControllerName stateName)
+   {
+      return stateMachine.getState(stateName);
+   }
+
    public HighLevelControllerName getCurrentHighLevelControlState()
    {
       return stateMachine.getCurrentStateKey();

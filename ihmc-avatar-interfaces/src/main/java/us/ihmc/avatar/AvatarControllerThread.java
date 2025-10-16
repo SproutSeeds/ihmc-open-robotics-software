@@ -80,6 +80,7 @@ public class AvatarControllerThread implements AvatarControllerThreadInterface
    private final YoGraphicsListRegistry yoGraphicsListRegistry = new YoGraphicsListRegistry();
    private final List<Supplier<YoGraphicDefinition>> scs2YoGraphicHolders = new ArrayList<>();
 
+   private final HumanoidHighLevelControllerManager highLevelControllerManager;
    private final ModularRobotController robotController;
 
    private final ROS2Publisher<ControllerCrashNotificationPacket> crashNotificationPublisher;
@@ -140,20 +141,23 @@ public class AvatarControllerThread implements AvatarControllerThreadInterface
 
       JointBasics[] arrayOfJointsToIgnore = createListOfJointsToIgnore(controllerFullRobotModel, robotModel, sensorInformation);
 
+      highLevelControllerManager = createHighLevelControllerManager(controllerFullRobotModel,
+                                                                    controllerFactory,
+                                                                    controllerTime,
+                                                                    robotModel.getControllerDT(),
+                                                                    gravity,
+                                                                    forceSensorDataHolderForController,
+                                                                    centerOfMassDataHolderForController,
+                                                                    centerOfPressureDataHolderForEstimator,
+                                                                    sensorInformation,
+                                                                    desiredJointDataHolder,
+                                                                    yoGraphicsListRegistry,
+                                                                    registry,
+                                                                    kinematicsSimulation,
+                                                                    arrayOfJointsToIgnore);
       robotController = createHighLevelController(controllerFullRobotModel,
-                                                  controllerFactory,
-                                                  controllerTime,
-                                                  robotModel.getControllerDT(),
-                                                  gravity,
-                                                  forceSensorDataHolderForController,
-                                                  centerOfMassDataHolderForController,
-                                                  centerOfPressureDataHolderForEstimator,
-                                                  sensorInformation,
-                                                  desiredJointDataHolder,
-                                                  yoGraphicsListRegistry,
-                                                  registry,
-                                                  kinematicsSimulation,
-                                                  arrayOfJointsToIgnore);
+                                                  highLevelControllerManager,
+                                                  yoGraphicsListRegistry);
 
       createControllerRobotMotionStatusUpdater(controllerFactory, robotMotionStatusHolder);
 
@@ -215,20 +219,20 @@ public class AvatarControllerThread implements AvatarControllerThreadInterface
       return fullRobotModelCorruptor;
    }
 
-   private ModularRobotController createHighLevelController(FullHumanoidRobotModel controllerModel,
-                                                            HighLevelHumanoidControllerFactory controllerFactory,
-                                                            YoDouble yoTime,
-                                                            double controlDT,
-                                                            double gravity,
-                                                            ForceSensorDataHolderReadOnly forceSensorDataHolderForController,
-                                                            CenterOfMassDataHolderReadOnly centerOfMassDataHolderForController,
-                                                            CenterOfPressureDataHolder centerOfPressureDataHolderForEstimator,
-                                                            HumanoidRobotSensorInformation sensorInformation,
-                                                            JointDesiredOutputListBasics lowLevelControllerOutput,
-                                                            YoGraphicsListRegistry yoGraphicsListRegistry,
-                                                            YoRegistry registry,
-                                                            boolean kinematicsSimulation,
-                                                            JointBasics... jointsToIgnore)
+   private HumanoidHighLevelControllerManager createHighLevelControllerManager(FullHumanoidRobotModel controllerModel,
+                                                                     HighLevelHumanoidControllerFactory controllerFactory,
+                                                                     YoDouble yoTime,
+                                                                     double controlDT,
+                                                                     double gravity,
+                                                                     ForceSensorDataHolderReadOnly forceSensorDataHolderForController,
+                                                                     CenterOfMassDataHolderReadOnly centerOfMassDataHolderForController,
+                                                                     CenterOfPressureDataHolder centerOfPressureDataHolderForEstimator,
+                                                                     HumanoidRobotSensorInformation sensorInformation,
+                                                                     JointDesiredOutputListBasics lowLevelControllerOutput,
+                                                                     YoGraphicsListRegistry yoGraphicsListRegistry,
+                                                                     YoRegistry registry,
+                                                                     boolean kinematicsSimulation,
+                                                                     JointBasics... jointsToIgnore)
    {
       if (CREATE_COM_CALIBRATION_TOOL)
       {
@@ -258,6 +262,14 @@ public class AvatarControllerThread implements AvatarControllerThreadInterface
                                                                                            centerOfPressureDataHolderForEstimator,
                                                                                            lowLevelControllerOutput,
                                                                                            jointsToIgnore);
+      return robotController;
+   }
+
+   private ModularRobotController createHighLevelController(FullHumanoidRobotModel controllerModel,
+                                                            HumanoidHighLevelControllerManager robotController,
+                                                            YoGraphicsListRegistry yoGraphicsListRegistry)
+   {
+
       scs2YoGraphicHolders.add(() -> robotController.getSCS2YoGraphics());
 
       ModularRobotController modularRobotController = new ModularRobotController("DRCMomentumBasedController");
@@ -384,6 +396,11 @@ public class AvatarControllerThread implements AvatarControllerThreadInterface
    public void addRobotController(RobotController controller)
    {
       robotController.addRobotController(controller);
+   }
+
+   public HumanoidHighLevelControllerManager getHighLevelControllerManager()
+   {
+      return highLevelControllerManager;
    }
 
    @Override

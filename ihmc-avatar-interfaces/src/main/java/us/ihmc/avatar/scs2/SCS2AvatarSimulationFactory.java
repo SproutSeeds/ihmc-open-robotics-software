@@ -21,7 +21,9 @@ import us.ihmc.commonWalkingControlModules.controllerCore.command.lowLevel.RootJ
 import us.ihmc.commonWalkingControlModules.desiredFootStep.footstepGenerator.HeadingAndVelocityEvaluationScriptParameters;
 import us.ihmc.commonWalkingControlModules.desiredFootStep.footstepGenerator.HeightMapBasedFootstepAdjustment;
 import us.ihmc.commonWalkingControlModules.dynamicPlanning.bipedPlanning.CoPTrajectoryParameters;
+import us.ihmc.commonWalkingControlModules.highLevelHumanoidControl.HumanoidHighLevelControllerManager;
 import us.ihmc.commonWalkingControlModules.highLevelHumanoidControl.factories.*;
+import us.ihmc.commonWalkingControlModules.highLevelHumanoidControl.highLevelStates.HighLevelControllerState;
 import us.ihmc.commonWalkingControlModules.highLevelHumanoidControl.plugin.ComponentBasedFootstepDataMessageGeneratorFactory;
 import us.ihmc.commonWalkingControlModules.highLevelHumanoidControl.plugin.HumanoidSteppingPluginFactory;
 import us.ihmc.commonWalkingControlModules.highLevelHumanoidControl.plugin.JoystickBasedSteppingPluginFactory;
@@ -522,20 +524,42 @@ public class SCS2AvatarSimulationFactory
       masterContext = new HumanoidRobotContextData(masterFullRobotModel);
 
       // Create the tasks that will be run on their own threads.
-      int estimatorDivisor = (int) Math.round(robotModel.getEstimatorDT() / simulationDT.get());
-      int controllerDivisor = (int) Math.round(robotModel.getControllerDT() / simulationDT.get());
-      int stepGeneratorDivisor = (int) Math.round(robotModel.getStepGeneratorDT() / simulationDT.get());
-      int handControlDivisor = (int) Math.round(robotModel.getSimulatedHandControlDT() / simulationDT.get());
-      HumanoidRobotControlTask estimatorTask = new EstimatorTask(estimatorThread, estimatorDivisor, simulationDT.get(), masterFullRobotModel);
-      HumanoidRobotControlTask controllerTask = new ControllerTask("Controller", controllerThread, controllerDivisor, simulationDT.get(), masterFullRobotModel);
+      final double simulationDT = this.simulationDT.get();
+      int estimatorDivisor = (int) Math.round(robotModel.getEstimatorDT() / simulationDT);
+      final int defaultControllerDivisor = (int) Math.round(robotModel.getControllerDT() / simulationDT);
+      int stepGeneratorDivisor = (int) Math.round(robotModel.getStepGeneratorDT() / simulationDT);
+      int handControlDivisor = (int) Math.round(robotModel.getSimulatedHandControlDT() / simulationDT);
+      HumanoidRobotControlTask estimatorTask = new EstimatorTask(estimatorThread, estimatorDivisor, simulationDT, masterFullRobotModel);
+      HumanoidRobotControlTask controllerTask = new ControllerTask("Controller", controllerThread, defaultControllerDivisor, simulationDT, masterFullRobotModel);
       HumanoidRobotControlTask stepGeneratorTask = new StepGeneratorTask("StepGenerator",
                                                                          stepGeneratorThread,
                                                                          stepGeneratorDivisor,
-                                                                         simulationDT.get(),
+                                                                         simulationDT,
                                                                          masterFullRobotModel);
+
+      // Add the ability to update the controller rate based on the high-level state.
+      HumanoidHighLevelControllerManager controllerManager = controllerThread.getHighLevelControllerManager();
+      controllerManager.addHighLevelStateChangedListener((from, to) ->
+                                                         {
+                                                            HighLevelControllerState newState = controllerManager.getHighLevelControllerState(to);
+                                                            if (!Double.isNaN(newState.getCustomControlRate()))
+                                                            {
+                                                               int newDivisor = (int) Math.round(newState.getCustomControlRate() / simulationDT);
+                                                               if (newDivisor != defaultControllerDivisor)
+                                                               {
+                                                                  controllerTask.setDivisor(newDivisor);
+                                                               }
+                                                            }
+                                                            else
+                                                            {
+                                                               controllerTask.setDivisor(defaultControllerDivisor);
+                                                            }
+                                                         });
+
+
       HumanoidRobotControlTask ikStreamingRTTask;
       if (createIKStreamingRealTimeController.get())
-         ikStreamingRTTask = ikStreamingRealTimePluginFactory.createRTTask(simulationDT.get());
+         ikStreamingRTTask = ikStreamingRealTimePluginFactory.createRTTask(simulationDT);
       else
          ikStreamingRTTask = null;
 
@@ -552,7 +576,7 @@ public class SCS2AvatarSimulationFactory
             SimulatedHandSensorReader handSensorReader = new SCS2SimulatedHandSensorReader(robot.getControllerManager().getControllerInput(), fingerJointNames);
             SimulatedHandOutputWriter handOutputWriter = new SCS2SimulatedHandOutputWriter(robot.getControllerManager().getControllerInput(),
                                                                                            robot.getControllerManager().getControllerOutput());
-            handControlTask = new SimulatedHandControlTask(handSensorReader, handControlThread, handOutputWriter, handControlDivisor, simulationDT.get());
+            handControlTask = new SimulatedHandControlTask(handSensorReader, handControlThread, handOutputWriter, handControlDivisor, simulationDT);
          }
       }
 
@@ -600,7 +624,7 @@ public class SCS2AvatarSimulationFactory
       else
       {
          TaskOverrunBehavior overrunBehavior = TaskOverrunBehavior.BUSY_WAIT;
-         robotController = new BarrierScheduledRobotController(controllerName, tasks, masterContext, overrunBehavior, simulationDT.get());
+         robotController = new BarrierScheduledRobotController(controllerName, tasks, masterContext, overrunBehavior, simulationDT);
          tasks.forEach(task -> new Thread(task, task.getClass().getSimpleName() + "Thread").start());
       }
 
