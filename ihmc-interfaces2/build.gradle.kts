@@ -11,7 +11,7 @@ buildscript {
 plugins {
    id("us.ihmc.ihmc-build")
    id("us.ihmc.log-tools-plugin") version "0.6.3"
-   id("us.ihmc.jros2.generator") version "1.1.998"
+   id("us.ihmc.jros2.generator") version "1.1.3"
 }
 
 ihmc {
@@ -19,11 +19,10 @@ ihmc {
 
    configureDependencyResolution()
    configurePublications()
-   declareMavenLocal()
 }
 
 mainDependencies {
-   api("us.ihmc:jros2:1.1.998")
+   api("us.ihmc:jros2:1.1.3")
 }
 
 sourceSets {
