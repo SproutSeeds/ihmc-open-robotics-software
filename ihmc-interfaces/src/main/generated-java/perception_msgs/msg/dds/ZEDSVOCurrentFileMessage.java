@@ -13,10 +13,6 @@ public class ZEDSVOCurrentFileMessage extends Packet<ZEDSVOCurrentFileMessage> i
             */
    public java.lang.StringBuilder current_file_name_;
    /**
-            * The record mode (0=record, 1=playback)
-            */
-   public byte record_mode_;
-   /**
             * The current position index of the current SVO file
             */
    public long current_position_;
@@ -40,8 +36,6 @@ public class ZEDSVOCurrentFileMessage extends Packet<ZEDSVOCurrentFileMessage> i
    {
       current_file_name_.setLength(0);
       current_file_name_.append(other.current_file_name_);
-
-      record_mode_ = other.record_mode_;
 
       current_position_ = other.current_position_;
 
@@ -71,21 +65,6 @@ public class ZEDSVOCurrentFileMessage extends Packet<ZEDSVOCurrentFileMessage> i
    public java.lang.StringBuilder getCurrentFileName()
    {
       return current_file_name_;
-   }
-
-   /**
-            * The record mode (0=record, 1=playback)
-            */
-   public void setRecordMode(byte record_mode)
-   {
-      record_mode_ = record_mode;
-   }
-   /**
-            * The record mode (0=record, 1=playback)
-            */
-   public byte getRecordMode()
-   {
-      return record_mode_;
    }
 
    /**
@@ -138,8 +117,6 @@ public class ZEDSVOCurrentFileMessage extends Packet<ZEDSVOCurrentFileMessage> i
 
       if (!us.ihmc.idl.IDLTools.epsilonEqualsStringBuilder(this.current_file_name_, other.current_file_name_, epsilon)) return false;
 
-      if (!us.ihmc.idl.IDLTools.epsilonEqualsPrimitive(this.record_mode_, other.record_mode_, epsilon)) return false;
-
       if (!us.ihmc.idl.IDLTools.epsilonEqualsPrimitive(this.current_position_, other.current_position_, epsilon)) return false;
 
       if (!us.ihmc.idl.IDLTools.epsilonEqualsPrimitive(this.length_, other.length_, epsilon)) return false;
@@ -159,8 +136,6 @@ public class ZEDSVOCurrentFileMessage extends Packet<ZEDSVOCurrentFileMessage> i
 
       if (!us.ihmc.idl.IDLTools.equals(this.current_file_name_, otherMyClass.current_file_name_)) return false;
 
-      if(this.record_mode_ != otherMyClass.record_mode_) return false;
-
       if(this.current_position_ != otherMyClass.current_position_) return false;
 
       if(this.length_ != otherMyClass.length_) return false;
@@ -177,8 +152,6 @@ public class ZEDSVOCurrentFileMessage extends Packet<ZEDSVOCurrentFileMessage> i
       builder.append("ZEDSVOCurrentFileMessage {");
       builder.append("current_file_name=");
       builder.append(this.current_file_name_);      builder.append(", ");
-      builder.append("record_mode=");
-      builder.append(this.record_mode_);      builder.append(", ");
       builder.append("current_position=");
       builder.append(this.current_position_);      builder.append(", ");
       builder.append("length=");

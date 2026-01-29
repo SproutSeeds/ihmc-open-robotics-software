@@ -23,7 +23,7 @@ import us.ihmc.perception.sceneGraph.rigidBody.doors.DoorNode;
 import us.ihmc.perception.sceneGraph.ros2.ROS2SceneGraph;
 import us.ihmc.perception.tools.PerceptionMessageTools;
 import us.ihmc.rdx.Lwjgl3ApplicationAdapter;
-import us.ihmc.rdx.perception.RDXZEDSVORecorderPanel;
+import us.ihmc.rdx.perception.RDXZEDSVOPlayerPanel;
 import us.ihmc.rdx.sceneManager.RDXSceneLevel;
 import us.ihmc.rdx.tools.LibGDXTools;
 import us.ihmc.rdx.tools.RDXModelBuilder;
@@ -84,7 +84,7 @@ public class RDXSceneGraphDemo
    private RawImage zedDepthImage;
    private final SideDependentList<RawImage> zedColorImages = new SideDependentList<>();
    private final MutableReferenceFrame sensorFrame = new MutableReferenceFrame();
-   private RDXZEDSVORecorderPanel zedSVORecorderPanel;
+   private RDXZEDSVOPlayerPanel zedSVORecorderPanel;
 
    public RDXSceneGraphDemo()
    {
@@ -162,7 +162,7 @@ public class RDXSceneGraphDemo
             zedPublishThread.addTopic(PerceptionAPI.EXPERIMENTAL_ZED_DEPTH, ZEDImageSensor.DEPTH_IMAGE_KEY);
             zedPublishThread.startRepeating();
 
-            zedSVORecorderPanel = new RDXZEDSVORecorderPanel(ros2Helper);
+            zedSVORecorderPanel = new RDXZEDSVOPlayerPanel(ros2Helper, baseUI);
 
             // Setup scene graph
             onRobotSceneGraph = new ROS2SceneGraph(ros2Helper);

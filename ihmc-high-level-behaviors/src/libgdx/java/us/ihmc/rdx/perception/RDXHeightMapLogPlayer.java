@@ -44,7 +44,7 @@ public class RDXHeightMapLogPlayer
    private final ROS2Node ros2Node;
 
    private final ROS2ZEDSVOPlaybackSensor zedPlaybackSensor;
-   private final RDXZEDSVORecorderPanel zedSVOPanel;
+   private final RDXZEDSVOPlayerPanel zedSVOPanel;
    private RDXReferenceFrameGraphic zedFrameGraphic;
 
    private final RDXRawImagePointCloudVisualizer zedPointCloudVisualizer = new RDXRawImagePointCloudVisualizer("ZED Point Cloud", true);
@@ -67,7 +67,7 @@ public class RDXHeightMapLogPlayer
       zedPlaybackSensor.useTrackedPose(true);
       BlockingQueue<RawImage> rawImageCollection = new LinkedBlockingQueue<>(ImageSensor.DEFAULT_IMAGE_QUEUE_CAPACITY);
       zedPlaybackSensor.registerImageQueue(rawImageCollection, ZEDImageSensor.DEPTH_IMAGE_KEY);
-      zedSVOPanel = new RDXZEDSVORecorderPanel(ros2Helper);
+      zedSVOPanel = new RDXZEDSVOPlayerPanel(ros2Helper, baseUI);
 
       heightMapVisualizer = new RDXROS2HeightMapVisualizer("Height Map Visualizer");
       heightMapVisualizer.setupForImageMessage(ros2Helper);

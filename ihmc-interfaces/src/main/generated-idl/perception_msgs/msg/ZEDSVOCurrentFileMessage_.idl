@@ -16,10 +16,6 @@ module perception_msgs
          */
         string current_file_name;
         /**
-         * The record mode (0=record, 1=playback)
-         */
-        octet record_mode;
-        /**
          * The current position index of the current SVO file
          */
         long long current_position;

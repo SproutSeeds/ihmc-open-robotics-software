@@ -28,7 +28,6 @@ public class ROS2ZEDSVOPlaybackSensor extends ZEDSVOPlaybackSensor
    private void publishSVOInfo()
    {
       svoStatusMessage.setCurrentFileName(svoFileName);
-      svoStatusMessage.setRecordMode((byte) 1); // playback
       svoStatusMessage.setCurrentPosition(getCurrentPosition());
       svoStatusMessage.setLength(getLength());
       ros2.publish(PerceptionAPI.ZED_SVO_CURRENT_FILE, svoStatusMessage);

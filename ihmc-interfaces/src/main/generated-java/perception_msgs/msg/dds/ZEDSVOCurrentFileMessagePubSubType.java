@@ -15,7 +15,7 @@ public class ZEDSVOCurrentFileMessagePubSubType implements us.ihmc.pubsub.TopicD
    @Override
    public final java.lang.String getDefinitionChecksum()
    {
-   		return "2fdc8174bf264a3a52254d0d5741a6849f66b7b57be62a731e9e75485198cdbd";
+   		return "4ef38358d7786da656ea6467893e9692252610387aa868da52ff5bea4b6f0285";
    }
    
    @Override
@@ -53,8 +53,6 @@ public class ZEDSVOCurrentFileMessagePubSubType implements us.ihmc.pubsub.TopicD
       int initial_alignment = current_alignment;
 
       current_alignment += 4 + us.ihmc.idl.CDR.alignment(current_alignment, 4) + 255 + 1;
-      current_alignment += 1 + us.ihmc.idl.CDR.alignment(current_alignment, 1);
-
       current_alignment += 8 + us.ihmc.idl.CDR.alignment(current_alignment, 8);
 
       current_alignment += 8 + us.ihmc.idl.CDR.alignment(current_alignment, 8);
@@ -74,9 +72,6 @@ public class ZEDSVOCurrentFileMessagePubSubType implements us.ihmc.pubsub.TopicD
 
       current_alignment += 4 + us.ihmc.idl.CDR.alignment(current_alignment, 4) + data.getCurrentFileName().length() + 1;
 
-      current_alignment += 1 + us.ihmc.idl.CDR.alignment(current_alignment, 1);
-
-
       current_alignment += 8 + us.ihmc.idl.CDR.alignment(current_alignment, 8);
 
 
@@ -93,8 +88,6 @@ public class ZEDSVOCurrentFileMessagePubSubType implements us.ihmc.pubsub.TopicD
       cdr.write_type_d(data.getCurrentFileName());else
           throw new RuntimeException("current_file_name field exceeds the maximum length: %d > %d".formatted(data.getCurrentFileName().length(), 255));
 
-      cdr.write_type_9(data.getRecordMode());
-
       cdr.write_type_11(data.getCurrentPosition());
 
       cdr.write_type_11(data.getLength());
@@ -104,8 +97,6 @@ public class ZEDSVOCurrentFileMessagePubSubType implements us.ihmc.pubsub.TopicD
    public static void read(perception_msgs.msg.dds.ZEDSVOCurrentFileMessage data, us.ihmc.idl.CDR cdr)
    {
       cdr.read_type_d(data.getCurrentFileName());	
-      data.setRecordMode(cdr.read_type_9());
-      	
       data.setCurrentPosition(cdr.read_type_11());
       	
       data.setLength(cdr.read_type_11());
@@ -117,7 +108,6 @@ public class ZEDSVOCurrentFileMessagePubSubType implements us.ihmc.pubsub.TopicD
    public final void serialize(perception_msgs.msg.dds.ZEDSVOCurrentFileMessage data, us.ihmc.idl.InterchangeSerializer ser)
    {
       ser.write_type_d("current_file_name", data.getCurrentFileName());
-      ser.write_type_9("record_mode", data.getRecordMode());
       ser.write_type_11("current_position", data.getCurrentPosition());
       ser.write_type_11("length", data.getLength());
    }
@@ -126,7 +116,6 @@ public class ZEDSVOCurrentFileMessagePubSubType implements us.ihmc.pubsub.TopicD
    public final void deserialize(us.ihmc.idl.InterchangeSerializer ser, perception_msgs.msg.dds.ZEDSVOCurrentFileMessage data)
    {
       ser.read_type_d("current_file_name", data.getCurrentFileName());
-      data.setRecordMode(ser.read_type_9("record_mode"));
       data.setCurrentPosition(ser.read_type_11("current_position"));
       data.setLength(ser.read_type_11("length"));
    }

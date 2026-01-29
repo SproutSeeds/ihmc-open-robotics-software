@@ -49,7 +49,7 @@ public class RDXDoorDetectionManagerDemo
    private final RapidPlanarRegionsExtractionThread planarRegionThread;
 
    private final RDXBaseUI baseUI;
-   private final RDXZEDSVORecorderPanel zedSVOPanel;
+   private final RDXZEDSVOPlayerPanel zedSVOPanel;
    private final RDXRawImagePointCloudRenderer pointCloudRenderer;
    private final RDXPlanarRegionsGraphic planarRegionsGraphic;
    private final RDXROS2YOLOv8Settings yoloSettings;
@@ -83,7 +83,7 @@ public class RDXDoorDetectionManagerDemo
       planarRegionThread.addPlanarRegionsConsumer(doorDetectionManager::updatePlanarRegions);
 
       baseUI = new RDXBaseUI();
-      zedSVOPanel = new RDXZEDSVORecorderPanel(ros2Helper);
+      zedSVOPanel = new RDXZEDSVOPlayerPanel(ros2Helper, baseUI);
       pointCloudRenderer = new RDXRawImagePointCloudRenderer();
       planarRegionsGraphic = new RDXPlanarRegionsGraphic();
       planarRegionsGraphic.setBlendOpacity(0.1f);
