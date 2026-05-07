@@ -40,6 +40,7 @@ import java.net.BindException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -206,7 +207,7 @@ public abstract class ToolboxModule implements CloseableAndDisposable
             }
             catch (RuntimeException e)
             {
-               if (e.getCause() instanceof BindException)
+               if (isYoVariableServerPortBindFailure(e))
                {
                   // There's another YoVariableServer running on the same port.
                   // Trying the next port
@@ -258,6 +259,28 @@ public abstract class ToolboxModule implements CloseableAndDisposable
       boolean autoDiscoverable = DataServerSettings.DEFAULT_AUTODISCOVERABLE;
       String videoStreamIdentifier = null;
       return new DataServerSettings(logSession, autoDiscoverable, startingPort, videoStreamIdentifier);
+   }
+
+   static boolean isYoVariableServerPortBindFailure(Throwable throwable)
+   {
+      Throwable current = throwable;
+      for (int depth = 0; current != null && depth < 16; depth++)
+      {
+         if (current instanceof BindException)
+            return true;
+
+         String message = current.getMessage();
+         if (message != null)
+         {
+            String lowerCaseMessage = message.toLowerCase(Locale.ROOT);
+            if (lowerCaseMessage.contains("bind") && lowerCaseMessage.contains("address already in use"))
+               return true;
+         }
+
+         current = current.getCause();
+      }
+
+      return false;
    }
 
    private Runnable createYoVariableServerRunnable(final YoVariableServer yoVariableServer)
